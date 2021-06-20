@@ -105,6 +105,19 @@
        (map #(merge % (show* %)) rtn)
        rtn))))
 
+(defn show-by-name
+  "Reveal full secret information of the secret with `name`."
+  [name]
+  (let [candidates (->> (ls)
+                        (filter #(= (:name %) name)))]
+    (when (empty? candidates)
+      (throw ex-info "Did not find a secret with that name." {:name name}))
+    (when (not-empty? (rest candidates))
+      (throw ex-info "Multiple secrets found with that name."
+             {:name name
+              :potential-matches candidates}))
+    (first candidates)))
+
 (defn- revealed? [secret]
   ;; assumption: if fullname is populated, then the secret is fully revealed
   (:fullname secret))
